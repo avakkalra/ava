@@ -1,0 +1,87 @@
+{% extends 'recommender/base.html' %}
+
+{% block content %}
+<div class="history fade-in">
+    <h1 class="section-title">Your Recommendation History</h1>
+    
+    <p class="section-description">
+        View all your previous music recommendations and create Spotify playlists from them.
+    </p>
+    
+    {% if histories %}
+        <div style="margin-top: var(--spacing-4);">
+            {% for history in histories %}
+                <div class="card" style="margin-bottom: var(--spacing-3);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-2);">
+                        <div>
+                            <h2 style="margin-bottom: 4px;">"{{ history.prompt }}"</h2>
+                            <p style="color: var(--spotify-light-gray); font-size: 14px;">
+                                {{ history.created_at|date:"F j, Y, g:i a" }}
+                            </p>
+                        </div>
+                        
+                        <a href="{% url 'create_playlist' history.id %}" class="btn btn-secondary">Create Playlist</a>
+                    </div>
+                    
+                    <div style="display: flex; overflow-x: auto; gap: var(--spacing-2); padding-bottom: var(--spacing-2);">
+                        {% for track in history.tracks_list %}
+                            <div style="min-width: 120px; max-width: 120px;">
+                                {% if track.image_url %}
+                                    <img src="{{ track.image_url }}" alt="{{ track.name }}" style="width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm);">
+                                {% else %}
+                                    <div style="width: 100%; aspect-ratio: 1; background-color: var(--spotify-dark-gray); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center;">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17C6 19.21 7.79 21 10 21C12.21 21 14 19.21 14 17V7H18V3H12ZM10 19C8.9 19 8 18.1 8 17C8 15.9 8.9 15 10 15C11.1 15 12 15.9 12 17C12 18.1 11.1 19 10 19Z" fill="#1DB954"/>
+                                        </svg>
+                                    </div>
+                                {% endif %}
+                                <div style="margin-top: 4px;">
+                                    <div style="font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {{ track.name }}
+                                    </div>
+                                    <div style="font-size: 12px; color: var(--spotify-light-gray); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        {% for artist in track.artists %}
+                                            {% if not forloop.first %}, {% endif %}{{ artist.name }}
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card" style="text-align: center; padding: var(--spacing-4);">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: var(--spacing-2);">
+                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#1DB954"/>
+                <path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="#1DB954"/>
+            </svg>
+            <h2 style="margin-bottom: var(--spacing-2);">No recommendations yet</h2>
+            <p style="color: var(--spotify-light-gray); margin-bottom: var(--spacing-3);">
+                Get started by asking for recommendations based on your mood or activity.
+            </p>
+            <a href="{% url 'recommend' %}" class="btn">Get Recommendations</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom scrollbar for recommendation history */
+    div::-webkit-scrollbar {
+        height: 6px;
+    }
+    
+    div::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+    }
+    
+    div::-webkit-scrollbar-thumb {
+        background-color: var(--spotify-green);
+        border-radius: 3px;
+    }
+</style>
+{% endblock %}

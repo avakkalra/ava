@@ -1,0 +1,80 @@
+{% extends 'recommender/base.html' %}
+
+{% block content %}
+<div class="card fade-in" style="max-width: 800px; margin: 0 auto;">
+    <h1 class="section-title">Get Music Recommendations</h1>
+    
+    <p class="section-description">
+        Tell us what kind of music you're in the mood for, and we'll recommend songs from your Spotify library that match your request.
+    </p>
+    
+    <form method="post" action="{% url 'recommend' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="prompt" class="form-label">What are you feeling?</label>
+            <input type="text" id="prompt" name="prompt" class="form-input" placeholder="e.g., energetic workout, chill evening, focus time, party night" required>
+        </div>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button type="submit" class="btn">Get Recommendations</button>
+            <p style="color: var(--spotify-light-gray); font-size: 14px;">Be specific for better results!</p>
+        </div>
+    </form>
+    
+    <div style="margin-top: var(--spacing-5);">
+        <h3 style="margin-bottom: var(--spacing-2);">Try these prompts:</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--spacing-2);">
+            <div class="suggestion-tag" onclick="fillPrompt('energetic workout')" style="background-color: rgba(29, 185, 84, 0.1); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-md); cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                Energetic workout
+            </div>
+            <div class="suggestion-tag" onclick="fillPrompt('chill evening music')" style="background-color: rgba(29, 185, 84, 0.1); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-md); cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                Chill evening music
+            </div>
+            <div class="suggestion-tag" onclick="fillPrompt('focus and concentration')" style="background-color: rgba(29, 185, 84, 0.1); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-md); cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                Focus and concentration
+            </div>
+            <div class="suggestion-tag" onclick="fillPrompt('party night')" style="background-color: rgba(29, 185, 84, 0.1); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-md); cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                Party night
+            </div>
+            <div class="suggestion-tag" onclick="fillPrompt('happy mood')" style="background-color: rgba(29, 185, 84, 0.1); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-md); cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                Happy mood
+            </div>
+            <div class="suggestion-tag" onclick="fillPrompt('relaxing acoustic')" style="background-color: rgba(29, 185, 84, 0.1); padding: var(--spacing-1) var(--spacing-2); border-radius: var(--radius-md); cursor: pointer; text-align: center; transition: all 0.2s ease;">
+                Relaxing acoustic
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function fillPrompt(text) {
+        document.getElementById('prompt').value = text;
+    }
+    
+    // Handle query parameters if coming from example links
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const promptParam = urlParams.get('prompt');
+        
+        if (promptParam) {
+            document.getElementById('prompt').value = promptParam;
+        }
+        
+        // Add hover effect for suggestion tags
+        const tags = document.querySelectorAll('.suggestion-tag');
+        tags.forEach(tag => {
+            tag.addEventListener('mouseover', function() {
+                this.style.backgroundColor = 'rgba(29, 185, 84, 0.2)';
+                this.style.transform = 'translateY(-2px)';
+            });
+            tag.addEventListener('mouseout', function() {
+                this.style.backgroundColor = 'rgba(29, 185, 84, 0.1)';
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>
+{% endblock %}

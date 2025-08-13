@@ -1,0 +1,104 @@
+{% extends 'recommender/base.html' %}
+
+{% block content %}
+<div class="hero fade-in">
+    <h1 class="section-title">Discover Your Music in a New Way</h1>
+    <p class="section-description">
+        SpotiFeel uses the power of your own Spotify library to recommend the perfect tracks for any mood, occasion, or feeling. Simply tell us what you're looking for, and we'll find the perfect songs from your collection.
+    </p>
+    
+    {% if user.is_authenticated %}
+        <a href="{% url 'recommend' %}" class="btn">Get Started</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="btn">Connect with Spotify</a>
+    {% endif %}
+</div>
+
+<div class="features fade-in" style="margin-top: var(--spacing-6);">
+    <div class="card" style="display: flex; flex-direction: column; align-items: center; text-align: center; padding: var(--spacing-4);">
+        <h2 style="margin-bottom: var(--spacing-3);">How It Works</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--spacing-4); width: 100%;">
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background-color: rgba(29, 185, 84, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-2);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z" fill="#1DB954"/>
+                        <path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="#1DB954"/>
+                    </svg>
+                </div>
+                <h3 style="margin-bottom: var(--spacing-1);">Connect</h3>
+                <p style="color: var(--spotify-light-gray);">Link your Spotify account to access your library</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background-color: rgba(29, 185, 84, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-2);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2ZM20 16H5.17L4 17.17V4H20V16Z" fill="#1DB954"/>
+                        <path d="M12 14H14V12H16V10H14V8H12V10H10V12H12V14ZM8 11C8.55 11 9 10.55 9 10C9 9.45 8.55 9 8 9C7.45 9 7 9.45 7 10C7 10.55 7.45 11 8 11ZM16 11C16.55 11 17 10.55 17 10C17 9.45 16.55 9 16 9C15.45 9 15 9.45 15 10C15 10.55 15.45 11 16 11Z" fill="#1DB954"/>
+                    </svg>
+                </div>
+                <h3 style="margin-bottom: var(--spacing-1);">Describe</h3>
+                <p style="color: var(--spotify-light-gray);">Tell us what kind of music you're in the mood for</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <div style="width: 64px; height: 64px; border-radius: 50%; background-color: rgba(29, 185, 84, 0.1); display: flex; align-items: center; justify-content: center; margin-bottom: var(--spacing-2);">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17C6 19.21 7.79 21 10 21C12.21 21 14 19.21 14 17V7H18V3H12ZM10 19C8.9 19 8 18.1 8 17C8 15.9 8.9 15 10 15C11.1 15 12 15.9 12 17C12 18.1 11.1 19 10 19Z" fill="#1DB954"/>
+                    </svg>
+                </div>
+                <h3 style="margin-bottom: var(--spacing-1);">Discover</h3>
+                <p style="color: var(--spotify-light-gray);">Get personalized recommendations from your library</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="examples fade-in" style="margin-top: var(--spacing-5);">
+    <h2 class="section-title">Try these examples</h2>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-3);">
+        {% if user.is_authenticated %}
+            <a href="{% url 'recommend' %}?prompt=energetic workout" class="card" style="text-decoration: none; color: inherit;">
+                <h3>Energetic Workout</h3>
+                <p style="color: var(--spotify-light-gray);">Perfect for high-intensity training</p>
+            </a>
+            
+            <a href="{% url 'recommend' %}?prompt=chill evening" class="card" style="text-decoration: none; color: inherit;">
+                <h3>Chill Evening</h3>
+                <p style="color: var(--spotify-light-gray);">Relaxing tunes to wind down</p>
+            </a>
+            
+            <a href="{% url 'recommend' %}?prompt=focus time" class="card" style="text-decoration: none; color: inherit;">
+                <h3>Focus Time</h3>
+                <p style="color: var(--spotify-light-gray);">Concentration-enhancing tracks</p>
+            </a>
+            
+            <a href="{% url 'recommend' %}?prompt=party night" class="card" style="text-decoration: none; color: inherit;">
+                <h3>Party Night</h3>
+                <p style="color: var(--spotify-light-gray);">Upbeat songs to get the party started</p>
+            </a>
+        {% else %}
+            <div class="card">
+                <h3>Energetic Workout</h3>
+                <p style="color: var(--spotify-light-gray);">Perfect for high-intensity training</p>
+            </div>
+            
+            <div class="card">
+                <h3>Chill Evening</h3>
+                <p style="color: var(--spotify-light-gray);">Relaxing tunes to wind down</p>
+            </div>
+            
+            <div class="card">
+                <h3>Focus Time</h3>
+                <p style="color: var(--spotify-light-gray);">Concentration-enhancing tracks</p>
+            </div>
+            
+            <div class="card">
+                <h3>Party Night</h3>
+                <p style="color: var(--spotify-light-gray);">Upbeat songs to get the party started</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

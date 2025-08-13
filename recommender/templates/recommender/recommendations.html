@@ -1,0 +1,232 @@
+{% extends 'recommender/base.html' %}
+
+{% block content %}
+<div class="recommendations fade-in">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-3);">
+        <div>
+            <h1 class="section-title">Recommendations for "{{ prompt }}"</h1>
+            <p class="section-description">Here are songs from your library that match your request.</p>
+        </div>
+        
+        <div>
+            <a href="{% url 'create_playlist' history_id %}" class="btn">Create Spotify Playlist</a>
+        </div>
+    </div>
+    
+    <div class="track-grid">
+        {% for track in tracks %}
+            <div class="track-card">
+                {% if track.image_url %}
+                    <img src="{{ track.image_url }}" alt="{{ track.name }}" class="track-image">
+                {% else %}
+                    <div class="track-image" style="background-color: var(--spotify-dark-gray); display: flex; align-items: center; justify-content: center;">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 3V13.55C11.41 13.21 10.73 13 10 13C7.79 13 6 14.79 6 17C6 19.21 7.79 21 10 21C12.21 21 14 19.21 14 17V7H18V3H12ZM10 19C8.9 19 8 18.1 8 17C8 15.9 8.9 15 10 15C11.1 15 12 15.9 12 17C12 18.1 11.1 19 10 19Z" fill="#1DB954"/>
+                        </svg>
+                    </div>
+                {% endif %}
+                <div class="track-info">
+                    <div class="track-name">{{ track.name }}</div>
+                    <div class="track-artist">
+                        {% for artist in track.artists %}
+                            {% if not forloop.first %}, {% endif %}{{ artist.name }}
+                        {% endfor %}
+                    </div>
+                    
+                    {% if track.preview_url %}
+                        <audio-player class="audio-player" data-src="{{ track.preview_url }}" data-track="{{ track.name }}"></audio-player>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div style="margin-top: var(--spacing-4); display: flex; justify-content: center;">
+        <a href="{% url 'recommend' %}" class="btn btn-secondary">Get More Recommendations</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Custom audio player component
+    class AudioPlayer extends HTMLElement {
+        constructor() {
+            super();
+            this.attachShadow({ mode: 'open' });
+            
+            const template = document.createElement('template');
+            template.innerHTML = `
+                <style>
+                    :host {
+                        display: block;
+                        margin-top: 8px;
+                    }
+                    
+                    .player {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    
+                    .play-button {
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 50%;
+                        background-color: #1DB954;
+                        border: none;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s ease;
+                    }
+                    
+                    .play-button:hover {
+                        transform: scale(1.1);
+                        background-color: #1ed760;
+                    }
+                    
+                    .progress {
+                        flex: 1;
+                        height: 4px;
+                        background-color: rgba(255, 255, 255, 0.2);
+                        border-radius: 2px;
+                        overflow: hidden;
+                    }
+                    
+                    .progress-bar {
+                        height: 100%;
+                        width: 0;
+                        background-color: #1DB954;
+                        transition: width 0.1s linear;
+                    }
+                    
+                    .visualizer {
+                        display: flex;
+                        align-items: center;
+                        gap: 2px;
+                        height: 16px;
+                    }
+                    
+                    .visualizer-bar {
+                        width: 2px;
+                        background-color: #1DB954;
+                        height: 100%;
+                        animation: sound 0ms -800ms linear infinite alternate;
+                    }
+                </style>
+                
+                <div class="player">
+                    <button class="play-button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 5V19L19 12L8 5Z" fill="white"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                    
+                    <div class="visualizer" style="display: none;">
+                        <div class="visualizer-bar" style="animation-duration: 474ms;"></div>
+                        <div class="visualizer-bar" style="animation-duration: 433ms;"></div>
+                        <div class="visualizer-bar" style="animation-duration: 407ms;"></div>
+                        <div class="visualizer-bar" style="animation-duration: 458ms;"></div>
+                        <div class="visualizer-bar" style="animation-duration: 400ms;"></div>
+                    </div>
+                </div>
+                
+                <audio></audio>
+            `;
+            
+            this.shadowRoot.appendChild(template.content.cloneNode(true));
+            
+            this.audio = this.shadowRoot.querySelector('audio');
+            this.playButton = this.shadowRoot.querySelector('.play-button');
+            this.progressBar = this.shadowRoot.querySelector('.progress-bar');
+            this.visualizer = this.shadowRoot.querySelector('.visualizer');
+            
+            this.isPlaying = false;
+            this.audio.src = this.getAttribute('data-src');
+            
+            this.playButton.addEventListener('click', () => this.togglePlay());
+            this.audio.addEventListener('timeupdate', () => this.updateProgress());
+            this.audio.addEventListener('ended', () => this.resetPlayer());
+            
+            // Set up visualizer animation
+            const bars = this.shadowRoot.querySelectorAll('.visualizer-bar');
+            bars.forEach(bar => {
+                bar.style.animationDuration = `${Math.random() * (500 - 300) + 300}ms`;
+            });
+            
+            // Add style for visualization animation
+            const styleSheet = new CSSStyleSheet();
+            styleSheet.replaceSync(`
+                @keyframes sound {
+                    0% {
+                        height: 2px;
+                    }
+                    100% {
+                        height: 16px;
+                    }
+                }
+            `);
+            this.shadowRoot.adoptedStyleSheets = [styleSheet];
+        }
+        
+        togglePlay() {
+            if (this.isPlaying) {
+                this.audio.pause();
+                this.isPlaying = false;
+                this.playButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 5V19L19 12L8 5Z" fill="white"/></svg>';
+                this.visualizer.style.display = 'none';
+            } else {
+                // Stop all other players
+                document.querySelectorAll('audio-player').forEach(player => {
+                    if (player !== this) {
+                        player.resetPlayer();
+                    }
+                });
+                
+                this.audio.play();
+                this.isPlaying = true;
+                this.playButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="white"/></svg>';
+                this.visualizer.style.display = 'flex';
+            }
+        }
+        
+        updateProgress() {
+            const percentage = (this.audio.currentTime / this.audio.duration) * 100;
+            this.progressBar.style.width = `${percentage}%`;
+        }
+        
+        resetPlayer() {
+            this.isPlaying = false;
+            this.progressBar.style.width = '0';
+            this.playButton.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 5V19L19 12L8 5Z" fill="white"/></svg>';
+            this.visualizer.style.display = 'none';
+        }
+    }
+    
+    // Register custom element
+    customElements.define('audio-player', AudioPlayer);
+    
+    // Add hover effects to track cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const trackCards = document.querySelectorAll('.track-card');
+        
+        trackCards.forEach(card => {
+            card.addEventListener('mouseover', function() {
+                this.style.transform = 'scale(1.05)';
+                this.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.3)';
+            });
+            
+            card.addEventListener('mouseout', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
+        });
+    });
+</script>
+{% endblock %}

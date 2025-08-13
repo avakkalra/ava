@@ -1,0 +1,48 @@
+{% extends 'recommender/base.html' %}
+
+{% block content %}
+<div class="card fade-in" style="max-width: 600px; margin: 0 auto; text-align: center; padding: var(--spacing-4);">
+    <h1 class="section-title">Connect to Spotify</h1>
+    
+    <p style="margin-bottom: var(--spacing-3); color: var(--spotify-light-gray);">
+        To get personalized recommendations, we need to connect to your Spotify account. We'll only read your music library and create playlists with your permission.
+    </p>
+    
+    <div style="margin: var(--spacing-4) 0;">
+        <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom: var(--spacing-2);">
+            <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM16.5 16.5C16.27 16.5 16.04 16.42 15.84 16.25C14.8 15.42 13.42 14.95 12 14.95C10.58 14.95 9.2 15.42 8.16 16.25C7.96 16.42 7.73 16.5 7.5 16.5C7.1 16.5 6.75 16.25 6.61 15.88C6.41 15.28 6.65 14.62 7.25 14.38C8.68 13.73 10.32 13.36 12 13.36C13.68 13.36 15.32 13.73 16.75 14.38C17.35 14.62 17.6 15.28 17.39 15.88C17.25 16.25 16.9 16.5 16.5 16.5ZM17.5 13.25C17.21 13.25 16.93 13.15 16.7 12.95C15.3 11.78 13.68 11.13 12 11.13C10.32 11.13 8.7 11.78 7.3 12.95C7.07 13.15 6.79 13.25 6.5 13.25C6.09 13.25 5.73 13 5.58 12.61C5.36 11.96 5.64 11.26 6.29 11.03C8.08 10.21 10.03 9.74 12 9.74C13.97 9.74 15.92 10.21 17.71 11.03C18.36 11.26 18.64 11.96 18.42 12.61C18.27 13 17.91 13.25 17.5 13.25ZM18.5 10C18.16 10 17.84 9.87 17.6 9.62C15.8 8.04 13.92 7.15 12 7.15C10.08 7.15 8.2 8.04 6.4 9.62C6.16 9.87 5.84 10 5.5 10C5.09 10 4.73 9.75 4.58 9.36C4.36 8.71 4.64 8.01 5.29 7.78C7.5 6.54 9.73 5.85 12 5.85C14.27 5.85 16.5 6.54 18.71 7.78C19.36 8.01 19.64 8.71 19.42 9.36C19.27 9.75 18.91 10 18.5 10Z" fill="#1DB954"/>
+        </svg>
+    </div>
+    
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        <button type="submit" class="btn" style="padding: var(--spacing-2) var(--spacing-4); font-size: 16px;">
+            Connect with Spotify
+        </button>
+    </form>
+    
+    <div style="margin-top: var(--spacing-4); border-top: 1px solid var(--spotify-gray); padding-top: var(--spacing-3);">
+        <h3 style="margin-bottom: var(--spacing-2);">Why connect?</h3>
+        <ul style="text-align: left; list-style-type: none;">
+            <li style="display: flex; align-items: center; margin-bottom: var(--spacing-2);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--spacing-2);">
+                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#1DB954"/>
+                </svg>
+                Personalized recommendations from YOUR library
+            </li>
+            <li style="display: flex; align-items: center; margin-bottom: var(--spacing-2);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--spacing-2);">
+                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#1DB954"/>
+                </svg>
+                Create Spotify playlists with one click
+            </li>
+            <li style="display: flex; align-items: center;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: var(--spacing-2);">
+                    <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="#1DB954"/>
+                </svg>
+                No account creation required - just use Spotify
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

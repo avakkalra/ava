@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpotiFeel - Music Recommendations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --spotify-green: #1DB954;
+            --spotify-black: #191414;
+            --spotify-dark-gray: #212121;
+            --spotify-gray: #535353;
+            --spotify-light-gray: #b3b3b3;
+            --spotify-white: #FFFFFF;
+            --spotify-success: #1DB954;
+            --spotify-warning: #F59B23;
+            --spotify-error: #EB1E32;
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --spacing-6: 48px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--spotify-black);
+            color: var(--spotify-white);
+            line-height: 1.5;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-2);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-2) 0;
+            margin-bottom: var(--spacing-4);
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--spotify-white);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo svg {
+            margin-right: var(--spacing-1);
+        }
+        
+        .logo-text {
+            background: linear-gradient(to right, var(--spotify-green), #4eda8c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-2);
+        }
+        
+        .nav-link {
+            color: var(--spotify-light-gray);
+            text-decoration: none;
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+        
+        .nav-link:hover {
+            color: var(--spotify-white);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: var(--spacing-1) var(--spacing-3);
+            background-color: var(--spotify-green);
+            color: var(--spotify-white);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            background-color: #1ed760;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--spotify-white);
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .messages {
+            margin-bottom: var(--spacing-3);
+        }
+        
+        .message {
+            padding: var(--spacing-2);
+            margin-bottom: var(--spacing-2);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--spotify-gray);
+        }
+        
+        .message.success {
+            background-color: rgba(29, 185, 84, 0.1);
+            border-left-color: var(--spotify-success);
+        }
+        
+        .message.error {
+            background-color: rgba(235, 30, 50, 0.1);
+            border-left-color: var(--spotify-error);
+        }
+        
+        .message.warning {
+            background-color: rgba(245, 155, 35, 0.1);
+            border-left-color: var(--spotify-warning);
+        }
+        
+        .card {
+            background-color: var(--spotify-dark-gray);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+        
+        .track-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-3);
+            margin-top: var(--spacing-3);
+        }
+        
+        .track-card {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .track-card:hover {
+            transform: scale(1.03);
+        }
+        
+        .track-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+        
+        .track-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            padding: var(--spacing-2);
+        }
+        
+        .track-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .track-artist {
+            color: var(--spotify-light-gray);
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-3);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-1);
+            font-weight: 600;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: var(--spacing-2);
+            background-color: var(--spotify-dark-gray);
+            border: 1px solid var(--spotify-gray);
+            border-radius: var(--radius-md);
+            color: var(--spotify-white);
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.2s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--spotify-green);
+            box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.3);
+        }
+        
+        .section-title {
+            margin-bottom: var(--spacing-3);
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .section-description {
+            color: var(--spotify-light-gray);
+            margin-bottom: var(--spacing-3);
+            max-width: 700px;
+        }
+        
+        footer {
+            margin-top: var(--spacing-6);
+            padding: var(--spacing-4) 0;
+            text-align: center;
+            color: var(--spotify-light-gray);
+            font-size: 14px;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: var(--spacing-2);
+                text-align: center;
+            }
+            
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .track-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container">
+        <nav class="navbar">
+            <a href="{% url 'home' %}" class="logo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM16.5 16.5C16.27 16.5 16.04 16.42 15.84 16.25C14.8 15.42 13.42 14.95 12 14.95C10.58 14.95 9.2 15.42 8.16 16.25C7.96 16.42 7.73 16.5 7.5 16.5C7.1 16.5 6.75 16.25 6.61 15.88C6.41 15.28 6.65 14.62 7.25 14.38C8.68 13.73 10.32 13.36 12 13.36C13.68 13.36 15.32 13.73 16.75 14.38C17.35 14.62 17.6 15.28 17.39 15.88C17.25 16.25 16.9 16.5 16.5 16.5ZM17.5 13.25C17.21 13.25 16.93 13.15 16.7 12.95C15.3 11.78 13.68 11.13 12 11.13C10.32 11.13 8.7 11.78 7.3 12.95C7.07 13.15 6.79 13.25 6.5 13.25C6.09 13.25 5.73 13 5.58 12.61C5.36 11.96 5.64 11.26 6.29 11.03C8.08 10.21 10.03 9.74 12 9.74C13.97 9.74 15.92 10.21 17.71 11.03C18.36 11.26 18.64 11.96 18.42 12.61C18.27 13 17.91 13.25 17.5 13.25ZM18.5 10C18.16 10 17.84 9.87 17.6 9.62C15.8 8.04 13.92 7.15 12 7.15C10.08 7.15 8.2 8.04 6.4 9.62C6.16 9.87 5.84 10 5.5 10C5.09 10 4.73 9.75 4.58 9.36C4.36 8.71 4.64 8.01 5.29 7.78C7.5 6.54 9.73 5.85 12 5.85C14.27 5.85 16.5 6.54 18.71 7.78C19.36 8.01 19.64 8.71 19.42 9.36C19.27 9.75 18.91 10 18.5 10Z" fill="#1DB954"/>
+                </svg>
+                <span class="logo-text">SpotiFeel</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}" class="nav-link">Home</a>
+                <a href="{% url 'recommend' %}" class="nav-link">Get Recommendations</a>
+                <a href="{% url 'history' %}" class="nav-link">History</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="btn btn-secondary">Logout</a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn">Connect Spotify</a>
+                {% endif %}
+            </div>
+        </nav>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </div>
+    
+    <footer>
+        <p>SpotiFeel &copy; 2025. A music recommendation app for your Spotify library.</p>
+    </footer>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>
