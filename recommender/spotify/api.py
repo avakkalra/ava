@@ -1,4 +1,5 @@
 import requests
+import random
 
 
 def get_user_profile(access_token):
@@ -123,7 +124,11 @@ def search_playlist_by_mood(access_token, mood, max_results=10):
     )
 
     if response.status_code == 200:
-        return response.json()
+        items = response.json()
+        items = items.get('playlists', {}).get('items', [])
+        items = list(filter(lambda x: x, items))
+        return random.choice(items).get('id', None) if items else None
+         
     else:
         print(f"Error {response.status_code}: {response.text}")
         return None
@@ -141,7 +146,7 @@ def get_tracks_from_playlist(access_token, playlist_id, max_tracks=10):
         params=params
     )
     if response.status_code == 200:
-        return response.json()['items']
+        return response.json().get('items', [])
     else:
         print("Error getting tracks:", response.status_code, response.text)
         return []    

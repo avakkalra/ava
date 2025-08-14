@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from datetime import timedelta
 import json
 import uuid
-
+from .recommendation.engine import MoodMusicRecommender
 from .models import UserProfile, RecommendationHistory
 from .spotify.auth import get_spotify_auth_url, get_spotify_tokens
 from .spotify.api import (
@@ -17,7 +17,8 @@ from .spotify.api import (
     get_user_library, 
     create_spotify_playlist,
     add_tracks_to_playlist,
-    search_playlist_by_mood
+    search_playlist_by_mood,
+    get_tracks_from_playlist
 )
 
 
@@ -29,13 +30,11 @@ def home(request):
 
 def login_view(request):
     """Login view with Spotify."""
-    if request.method == 'POST':
-        # Create a temporary user for Spotify auth flow
-        username = f"user_{uuid.uuid4().hex[:8]}"
-        user = User.objects.create_user(username=username, password=None)
-        login(request, user)
-        return redirect('connect_spotify')
-    return render(request, 'recommender/login.html')
+    # if request.method == 'POST':
+    #     auth_url = get_spotify_auth_url()
+    #     # Create a temporary user for Spotify auth flow
+    return redirect('connect_spotify')
+    # return render(request, 'recommender/login.html')
 
 
 @login_required
@@ -45,14 +44,12 @@ def logout_view(request):
     return redirect('home')
 
 
-@login_required
 def connect_spotify(request):
     """Connect to Spotify."""
     auth_url = get_spotify_auth_url()
     return redirect(auth_url)
 
 
-@login_required
 def spotify_callback(request):
     """Handle Spotify OAuth callback."""
     code = request.GET.get('code')
@@ -97,6 +94,7 @@ def spotify_callback(request):
 
     request.user = user
     request._cached_user = user  # Update the request user
+    login(request, user)
     
     messages.success(request, "Successfully connected to Spotify!")
     return redirect('home')
@@ -122,23 +120,21 @@ def recommend(request):
                 return redirect('connect_spotify')
             
             # Get user library from Spotify
-            library = get_user_library(user_profile.access_token)
-            test = search_playlist_by_mood(user_profile.access_token, "sad")
-            print(test, flush=True)
-            # Get recommendations based on prompt and library
-            recommended_tracks = recommend_tracks(prompt, library)
+            # library = get_user_library(user_profile.access_token)
+            playlist_id = search_playlist_by_mood(user_profile.access_token, prompt)
+            tracks = get_tracks_from_playlist(user_profile.access_token, playlist_id)
             
             # Save recommendation to history
             history = RecommendationHistory(
                 user=request.user,
                 prompt=prompt
             )
-            history.set_tracks(recommended_tracks)
+            history.set_tracks(tracks)
             history.save()
             
             return render(request, 'recommender/recommendations.html', {
                 'prompt': prompt,
-                'tracks': recommended_tracks,
+                'tracks': tracks,
                 'history_id': history.id
             })
         
