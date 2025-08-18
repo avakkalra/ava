@@ -5,7 +5,7 @@
     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-3);">
         <div>
             <h1 class="section-title">Recommendations for "{{ prompt }}"</h1>
-            <p class="section-description">Here are songs from your library that match your request.</p>
+            <p class="section-description">Here are songs that match your request.</p>
         </div>
         
         <div>
@@ -16,8 +16,8 @@
     <div class="track-grid">
         {% for track in tracks %}
             <div class="track-card">
-                {% if track.image_url %}
-                    <img src="{{ track.image_url }}" alt="{{ track.name }}" class="track-image">
+                {% if track.track.album.images.0.url %}
+                    <img src="{{ track.track.album.images.0.url }}" alt="{{ track.name }}" class="track-image">
                 {% else %}
                     <div class="track-image" style="background-color: var(--spotify-dark-gray); display: flex; align-items: center; justify-content: center;">
                         <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -26,15 +26,22 @@
                     </div>
                 {% endif %}
                 <div class="track-info">
-                    <div class="track-name">{{ track.name }}</div>
+                    <div class="track-name">{{ track.track.name }}</div>
                     <div class="track-artist">
                         {% for artist in track.artists %}
                             {% if not forloop.first %}, {% endif %}{{ artist.name }}
                         {% endfor %}
                     </div>
                     
-                    {% if track.preview_url %}
-                        <audio-player class="audio-player" data-src="{{ track.preview_url }}" data-track="{{ track.name }}"></audio-player>
+                    {% if track.track.href %}
+                    <iframe class="audio-player"
+        src="https://open.spotify.com/embed/track/{{ track.track.id }}"
+        width="300" height="80" frameborder="0"
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        title="{{ track.track.name }}">
+</iframe>
+
+
                     {% endif %}
                 </div>
             </div>
